@@ -103,13 +103,13 @@ struct workio_cmd {
 enum sha256_algos {
 	ALGO_SCRYPT,		/* scrypt(1024,1,1) */
 	ALGO_SHA256D,		/* SHA-256d */
-	ALGO_SKEIN,		/* Skein */
+	ALGO_GROESTL,		/* Groestl */
 };
 
 static const char *algo_names[] = {
 	[ALGO_SCRYPT]		= "scrypt",
 	[ALGO_SHA256D]		= "sha256d",
-	[ALGO_SKEIN]		= "skein",
+	[ALGO_GROESTL]		= "groestl",
 };
 
 bool opt_debug = false;
@@ -169,7 +169,7 @@ Options:\n\
   -a, --algo=ALGO       specify the algorithm to use\n\
                           scrypt    scrypt(1024, 1, 1) (default)\n\
                           sha256d   SHA-256d\n\
-			  skein     Skein+Sha256\n\
+                          groestl   Groestl+Sha256\n\
   -o, --url=URL         URL of mining server (default: " DEF_RPC_URL ")\n\
   -O, --userpass=U:P    username:password pair for mining server\n\
   -u, --user=USERNAME   username for mining server\n\
@@ -766,8 +766,8 @@ static void *miner_thread(void *userdata)
 			                      max_nonce, &hashes_done);
 			break;
 
-		case ALGO_SKEIN:
-			rc = scanhash_skein(thr_id, work.data, work.target,
+		case ALGO_GROESTL:
+			rc = scanhash_groestl(thr_id, work.data, work.target,
 			                      max_nonce, &hashes_done);
 			break;
 

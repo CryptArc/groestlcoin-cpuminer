@@ -6,11 +6,11 @@
 
 #include <openssl/sha.h>
 
-#include "sph_skein.h"
+#include "sph_groestl.h"
 
-static void skeinhash(void *state, const void *input)
+static void groestlhash(void *state, const void *input)
 {
-    sph_skein512_context     ctx_skein;
+    sph_groestl512_context     ctx_groestl;
     static unsigned char pblank[1];
 
     uint32_t mask = 8;
@@ -19,9 +19,9 @@ static void skeinhash(void *state, const void *input)
 	//these uint512 in the c++ source of the client are backed by an array of uint32
     uint32_t hashA[16], hashB[16];	
 	
-    sph_skein512_init(&ctx_skein);
-    sph_skein512 (&ctx_skein, input, 80); //6
-    sph_skein512_close(&ctx_skein, hashA); //7
+    sph_groestl512_init(&ctx_groestl);
+    sph_groestl512 (&ctx_groestl, input, 80); //6
+    sph_groestl512_close(&ctx_groestl, hashA); //7
 
     SHA256_CTX sha256;
     SHA256_Init(&sha256);
@@ -41,7 +41,7 @@ static void skeinhash(void *state, const void *input)
 */	
 }
 
-int scanhash_skein(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
+int scanhash_groestl(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 	uint32_t max_nonce, unsigned long *hashes_done)
 {
 	uint32_t n = pdata[19] - 1;
@@ -65,7 +65,7 @@ int scanhash_skein(int thr_id, uint32_t *pdata, const uint32_t *ptarget,
 	
 		pdata[19] = ++n;
 		be32enc(&endiandata[19], n); 
-		skeinhash(hash64, &endiandata);
+		groestlhash(hash64, &endiandata);
         if (((hash64[7]&0xFFFFFF00)==0) && 
 				fulltest(hash64, ptarget)) {
             *hashes_done = n - first_nonce + 1;
